@@ -1,9 +1,13 @@
 /*
  ============================================================================
  Name        : input.h
- Descrizione : Interfaccia per l'input system
-               - Definizioni costanti per tasti speciali
-               - Prototipo della funzione di lettura input
+ Descrizione : Interfaccia per il sistema di input multipiattaforma
+               - Definizioni costanti per tasti speciali (frecce, INVIO, ESC)
+               - Prototipo della funzione di lettura input personalizzata
+               - Gestione automatica delle dipendenze per Windows/Linux
+               - Codici standardizzati per navigazione menu e gameplay
+               - Sistema unificato per WASD e frecce direzionali
+               - Mappatura tasti speciali per tutte le piattaforme supportate
  ============================================================================
  */
 

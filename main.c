@@ -1,7 +1,23 @@
 /*
  ============================================================================
  Name        : main.c
- Descrizione : Loop principale di gioco e gestione stati
+ Descrizione : Macchina a stati principale e loop di controllo del gioco Sudoku X
+               - Gestione completa di 7 stati di gioco (MENU, DIFFICULTY, LOADMENU, PLAYING, PAUSED, WIN, GAMEOVER)
+               - Inizializzazione centralizzata della struttura Game e random seed
+               - Navigazione menu multilivello con supporto sia frecce direzionali che tasti WASD
+               - Integrazione completa con sistema input multipiattaforma tramite getch_custom()
+               - Macchina a stati a ciclo continuo con switch principale per transizioni controllate
+               - Gestione eventi di input specifici per ogni stato con logiche dedicate
+               - Chiamate coordinate alle funzioni di rendering appropriate per ogni schermata
+               - Gestione uscita applicazione, reset partite e riavvio con mantenimento impostazioni
+               - Coordinamento tra logica Sudoku, sistema interfaccia e gestione salvataggi
+               - Timer di gioco integrato tramite time() con calcolo minuti/secondi
+               - Supporto per salvataggio rapido in-game (tasto V) con conferma visuale
+               - Fallback a input numerico diretto (1-3) per selezione rapida difficoltà
+               - Gestione errori di caricamento con ritorno allo stato precedente
+               - Transizioni di stato fluide con pulizia schermo e re-inizializzazioni appropriate
+               - Controllo coerenza dati tra stati diversi e prevenzione condizioni inconsistenti
+               - Punto di ingresso unificato per tutta l'applicazione con gestione risorse centralizzata
  ============================================================================
  */
 

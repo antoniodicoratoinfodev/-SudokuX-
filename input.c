@@ -1,10 +1,15 @@
 /*
  ============================================================================
  Name        : input.c
- Descrizione : Gestione input multi-piattaforma
-               - Lettura tasti senza echo
-               - Supporto per tasti speciali (frecce, ESC)
-               - Astrazione dalle differenze Windows/Linux/MacOS
+ Descrizione : Implementazione del sistema di input multipiattaforma
+               - Lettura tasti senza echo (modalità raw del terminale)
+               - Supporto completo per tasti speciali (frecce direzionali, ESC, INVIO)
+               - Astrazione completa dalle differenze Windows/Linux/MacOS
+               - Gestione non-bloccante delle sequenze ESC per Linux/MacOS con select()
+               - Mapping unificato dei codici tasti per navigazione UI
+               - Supporto sia per WASD che per frecce direzionali
+               - Rilevamento sequenze multi-carattere per tasti funzione
+               - Ripristino automatico impostazioni terminale dopo lettura
  ============================================================================
  */
 

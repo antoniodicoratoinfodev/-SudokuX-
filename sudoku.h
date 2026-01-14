@@ -1,12 +1,17 @@
 /*
  ============================================================================
  Name        : sudoku.h
- Descrizione : Definizioni per il Sudoku X
-               - Strutture dati fondamentali (Sudoku, Game)
-               - Costanti di configurazione
-               - Prototipi di tutte le funzioni pubbliche
-               - Enumerativi per stati di gioco e difficoltà
-
+ Descrizione : Definizioni complete per il Sudoku X
+               - Strutture dati fondamentali (Sudoku, Game) con array a dimensione fissa MAX_SIZE
+               - Costanti di configurazione layout, margini e dimensioni interfaccia
+               - Definizioni colori ANSI/escape codes per interfaccia avanzata (supporto 256-colori)
+               - Prototipi di tutte le funzioni pubbliche per logica di gioco e rendering UI
+               - Enumerativi per 7 stati di gioco e 3 livelli di difficoltà configurabili
+               - Vincoli diagonali specifici del Sudoku X (diagonale principale e secondaria)
+               - Sistema di punteggio dinamico, gestione errori e timer integrato
+               - Supporto per fino a 99 file di salvataggio con numerazione automatica
+               - Costanti per controllo validità e stati delle celle (UNASSIGNED)
+               - Direttive per gestione directory e file system cross-platform
  ============================================================================
  */
 

@@ -1,11 +1,31 @@
 /*
  ============================================================================
  Name        : sudoku.c
- Descrizione : Implementazione delle funzionalità logiche del Sudoku X
-               - Generazione e risoluzione di griglie
-               - Gestione regole del Sudoku con vincoli diagonali
-               - Sistema di salvataggio/caricamento partite
-               - Renderizzazione interfaccia testuale
+ Descrizione : Implementazione completa del motore Sudoku X
+               - Generazione, risoluzione e validazione di griglie 9x9 con algoritmo backtracking randomizzato
+               - Gestione regole Sudoku X con vincoli diagonali aggiuntivi su entrambe le diagonali
+               - Sistema avanzato di salvataggio/caricamento con supporto per 99 file (save1.txt a save99.txt)
+               - Renderizzazione interfaccia testuale avanzata con colori ANSI, bordi dinamici e formattazione precisa
+               - Gestione di 7 stati di gioco con transizioni fluide tra menu, gameplay e schermate di sistema
+               - Sistema di navigazione menu dinamico con selezione, eliminazione salvataggi e conferma visuale
+               - Algoritmi di validazione per righe, colonne, box 3x3 e diagonali con controllo duplicati
+               - Generazione puzzle con 3 livelli di difficoltà (33%, 50%, 75% celle rimosse) e randomizzazione
+               - Gestione input gameplay con cursore mobile, comandi WASD, tasti numerici e tasti funzione
+               - Sistema di punteggio dinamico (+10 punti/inserimento corretto, -5 punti/errore) con timer integrato
+               - Meccanismo errori a soglia (5 errori massimi prima di game over) con feedback visivo
+               - Rilevamento automatico vittoria e schermata risultati con statistiche complete (tempo, punteggio, errori)
+               - Gestione partite temporanee quando salvataggi esauriti, con avvisi e limitazioni appropriate
+               - Funzioni di utilità per disegno bordi, centratura testo con escape codes, calcolo layout dinamico
+               - Controllo file system con rilevamento, ordinamento e validazione salvataggi esistenti
+               - Interfaccia di eliminazione file con doppia conferma e aggiornamento dinamico della lista
+               - Sistema di numerazione automatica che trova il primo slot disponibile tra 1-99
+               - Supporto timeout e gestione errori I/O con messaggi utente chiari
+               - Integrazione completa con sistema input multipiattaforma per esperienza utente coerente
+               - Funzioni helper per parsing nomi file, estrazione numeri salvataggio e gestione stringhe
+               - Calcolo e visualizzazione statistiche partita in tempo reale nell'interfaccia principale
+               - Supporto per griglie di diverse dimensioni (fino a 36x36 teoricamente) con boxSize configurabile
+               - Sistema di suggerimenti e feedback visivo per celle diagonali con colorazione distinta
+               - Gestione pause con salvataggio stato e ripresa precisa dalla posizione precedente
  ============================================================================
  */
 
