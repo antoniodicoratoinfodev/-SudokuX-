@@ -1,11 +1,10 @@
 /*
  ============================================================================
  Name        : input.c
- Author      : Leonardo, Antonio, Francesco, Michele, Vincenzo
  Descrizione : Gestione input multi-piattaforma
                - Lettura tasti senza echo
                - Supporto per tasti speciali (frecce, ESC)
-               - Astrazione dalle differenze Windows/Linux
+               - Astrazione dalle differenze Windows/Linux/MacOS
  ============================================================================
  */
 
@@ -31,34 +30,57 @@ int getch_custom() {
 }
 
 #else
+#include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
+#include <sys/select.h>     // SPOSTATO QUI
+#include <sys/time.h>       // SPOSTATO QUI
 
 int getch_custom() {
     struct termios oldt, newt;
     int ch;
-
+    
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
     newt.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
+    
     ch = getchar();
-
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-
-    // Gestione tasti freccia (sequenze ANSI)
+    
+    // Gestione ESC senza bloccare
     if (ch == 27) {
-        if (getchar() == 91) {
-            switch(getchar()) {
-                case 65: return CURSOR_UP;
-                case 66: return CURSOR_DOWN;
-                case 67: return CURSOR_RIGHT;
-                case 68: return CURSOR_LEFT;
+        // Verifica se ci sono caratteri disponibili immediatamente (non bloccante)
+        struct timeval tv = {0, 0};
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(STDIN_FILENO, &fds);
+        
+        // Se c'è un carattere disponibile, è probabilmente parte di una sequenza
+        if (select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv) > 0) {
+            int ch2 = getchar();
+            if (ch2 == 91) { // Carattere '['
+                // Verifica se c'è il terzo carattere
+                FD_ZERO(&fds);
+                FD_SET(STDIN_FILENO, &fds);
+                if (select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv) > 0) {
+                    int ch3 = getchar();
+                    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+                    switch(ch3) {
+                        case 65: return CURSOR_UP;
+                        case 66: return CURSOR_DOWN;
+                        case 67: return CURSOR_RIGHT;
+                        case 68: return CURSOR_LEFT;
+                        default: return CURSOR_BACK;
+                    }
+                }
             }
         }
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
         return CURSOR_BACK;
     }
+    
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    
     if (ch == 10) return CURSOR_SELECT;
     return ch;
 }

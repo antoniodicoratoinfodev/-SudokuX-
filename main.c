@@ -1,7 +1,6 @@
 /*
  ============================================================================
  Name        : main.c
- Author      : Leonardo, Antonio, Francesco, Michele, Vincenzo
  Descrizione : Loop principale di gioco e gestione stati
  ============================================================================
  */

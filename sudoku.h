@@ -1,7 +1,6 @@
 /*
  ============================================================================
  Name        : sudoku.h
- Author      : Leonardo, Antonio, Francesco, Michele, Vincenzo
  Descrizione : Definizioni per il Sudoku X
                - Strutture dati fondamentali (Sudoku, Game)
                - Costanti di configurazione

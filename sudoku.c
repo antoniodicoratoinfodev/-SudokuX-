@@ -1,7 +1,6 @@
 /*
  ============================================================================
  Name        : sudoku.c
- Author      : Leonardo, Antonio, Francesco, Michele, Vincenzo
  Descrizione : Implementazione delle funzionalità logiche del Sudoku X
                - Generazione e risoluzione di griglie
                - Gestione regole del Sudoku con vincoli diagonali
@@ -17,13 +16,43 @@
 #include <unistd.h>
 #include <ctype.h>
 
+/*  questo: */
+#include "input.h"  // INCLUDA SEMPRE input.h - FUORI dal #ifdef
+
 #ifdef _WIN32
-#include "input.h"
 #include <conio.h>
 #else
 #include <termios.h>
 #endif
+/* ========== FUNZIONE HELPER PER TROVARE NUMERO DISPONIBILE ========== */
 
+/**
+ * Trova il primo numero di salvataggio disponibile (1-99)
+ * Scansiona i file save1.txt, save2.txt, ... e ritorna il primo buco
+ * Ritorna 0 se tutti i numeri 1-99 sono occupati
+ */
+static int findAvailableSaveNumber() {
+    int num = 1;
+    char filename[100];
+    FILE* testFile;
+    
+    while (num <= 99) {
+        snprintf(filename, sizeof(filename), "save%d.txt", num);
+        testFile = fopen(filename, "r");
+        
+        if (testFile) {
+            // File esiste, prova il successivo
+            fclose(testFile);
+            num = num + 1;
+        } else {
+            // File non esiste, numero disponibile
+            return num;
+        }
+    }
+    
+    // Tutti i numeri 1-99 occupati
+    return 0;
+}
 /* ========== FUNZIONI DI UTILITÀ PER L'INTERFACCIA ========== */
 
 /**
@@ -1298,17 +1327,31 @@ void showWinScreen(Game* game) {
 }
 
 void newGame(Game* game, int difficultyLevel) {
-    static int partitaCounter = 1;
-    snprintf(game->gameName, sizeof(game->gameName), "Partita %d", partitaCounter);
-    partitaCounter = partitaCounter + 1;
+    // Trova il primo numero di salvataggio disponibile
+    int nextNum = findAvailableSaveNumber();
+    
+    if (nextNum == 0) {
+        // Caso limite: tutti i numeri 1-99 occupati
+        // Usa un nome fisso che non corrisponde a nessun file
+        snprintf(game->gameName, sizeof(game->gameName), "Partita Temporanea");
+    } else {
+        // Nome standard con numero disponibile
+        snprintf(game->gameName, sizeof(game->gameName), "Partita %d", nextNum);
+    }
+    
     int boxSize = 3;
-
+    
+    // Inizializza griglia vuota
     initSudoku(&game->sudoku, boxSize);
+    
+    // Genera soluzione completa
     solveGrid(&game->sudoku);
-
+    
+    // Imposta difficoltà e rimuovi celle
     game->sudoku.difficultyLevel = difficultyLevel;
     generatePuzzle(&game->sudoku, difficultyLevel);
-
+    
+    // Inizializza stato di gioco
     game->cursorRow = 0;
     game->cursorCol = 0;
     game->errors = 0;
@@ -1316,7 +1359,6 @@ void newGame(Game* game, int difficultyLevel) {
     game->startTime = time(NULL);
     game->gameState = STATE_PLAYING;
 }
-
 /**
 * Carica una partita da file e passa allo stato PLAYING
 */
@@ -1381,26 +1423,59 @@ void handleGameInput(Game* game) {
             break;
 
         case 'v': case 'V': {
-            int partitaNum = 1;
-            sscanf(game->gameName, "Partita %d", &partitaNum);
-
-            char savePath[32];
-            snprintf(savePath, sizeof(savePath), "save%d.txt", partitaNum);
-
-            if (saveGame(&game->sudoku, savePath, game->cursorRow, game->cursorCol,
-                        game->errors, game->score, game->gameName)) {
-                clearScreen();
-                printf("\nPartita salvata come 'Salvataggio %d' con successo!\n", partitaNum);
-                printf("(Premere un tasto per continuare)\n");
-                getch_custom();
-            } else {
-                clearScreen();
-                printf("\nErrore nel salvataggio!\n");
-                printf("(Premere un tasto per continuare)\n");
-                getch_custom();
-            }
+    // Verifica se è una partita temporanea (non salvabile)
+    if (strstr(game->gameName, "Temporanea") != NULL) {
+        clearScreen();
+        printf("\n[!] ERRORE: Partita temporanea non salvabile!\n");
+        printf("    Hai raggiunto il limite di 99 salvataggi.\n");
+        printf("    Elimina alcuni salvataggi per liberare spazio.\n");
+        printf("\n    Premi un tasto per continuare...\n");
+        getch_custom();
+        break;
+    }
+    
+    // Estrai numero dalla partita (formato "Partita X")
+    int partitaNum = 0;
+    int parsed = sscanf(game->gameName, "Partita %d", &partitaNum);
+    
+    // Verifica validità numero estratto
+    if (parsed != 1 || partitaNum < 1 || partitaNum > 99) {
+        // Fallback: cerca un nuovo numero disponibile
+        partitaNum = findAvailableSaveNumber();
+        
+        if (partitaNum == 0) {
+            clearScreen();
+            printf("\n[!] ERRORE: Impossibile trovare un numero di salvataggio.\n");
+            printf("\n    Premi un tasto per continuare...\n");
+            getch_custom();
             break;
         }
+        
+        // Aggiorna il nome della partita con il numero valido
+        snprintf(game->gameName, sizeof(game->gameName), "Partita %d", partitaNum);
+    }
+    
+    // Crea percorso file
+    char savePath[32];
+    snprintf(savePath, sizeof(savePath), "save%d.txt", partitaNum);
+    
+    // Esegui salvataggio
+    if (saveGame(&game->sudoku, savePath, game->cursorRow, game->cursorCol,
+                game->errors, game->score, game->gameName)) {
+        clearScreen();
+        printf("\n[OK] Partita salvata con successo!\n");
+        printf("     File: save%d.txt\n", partitaNum);
+        printf("\n     Premi un tasto per continuare...\n");
+        getch_custom();
+    } else {
+        clearScreen();
+        printf("\n[!] ERRORE: Impossibile salvare la partita!\n");
+        printf("    Verifica i permessi del file system.\n");
+        printf("\n    Premi un tasto per continuare...\n");
+        getch_custom();
+    }
+    break;
+}
 
         case 'm': case 'M':
             game->gameState = STATE_MENU;

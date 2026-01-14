@@ -1,7 +1,6 @@
 /*
  ============================================================================
  Name        : input.h
- Author      : Leonardo, Antonio, Francesco, Michele, Vincenzo
  Descrizione : Interfaccia per l'input system
                - Definizioni costanti per tasti speciali
                - Prototipo della funzione di lettura input
