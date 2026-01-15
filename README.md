@@ -35,7 +35,7 @@ In caso di problemi con l'eseguibile o il salvataggio, aprire come amministrator
 
 ## Licenza e utilizzo
 
-Copyright (c) 2026 Antonio Di Corato  
+Copyright (c) 2026 Antonio Dicorato  
 Tutti i diritti riservati.
 
 Questo progetto **NON è open source**.
