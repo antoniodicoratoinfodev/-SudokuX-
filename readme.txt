@@ -6,7 +6,7 @@ In case of issues with the executable or save files, please run the program as a
 
 ## License & Usage
 
-Copyright (c) 2026 Antonio Di Corato  
+Copyright (c) 2026 Antonio Dicorato  
 All rights reserved.
 
 This project is **NOT open source**.
