@@ -1,11 +1,15 @@
 # IMPORTANT NOTICE
+
 In case of issues with the executable or save files, please run the program as administrator.
+
 ---
+
 ## License & Usage
+
 Copyright (c) 2026 Antonio Dicorato  
 All rights reserved.
 
----> This project is **NOT open source**. <---
+This project is **NOT open source**.
 
 The source code and all related files are provided **for viewing and evaluation purposes only**.
 
