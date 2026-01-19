@@ -102,6 +102,5 @@ void loadGameOption(Game* game, const char* filename);
 void handleGameInput(Game* game);
 int getch_custom();
 void deleteSavedGameInterface();
-// ================= OTTIMIZZAZIONE RENDERING =================
-void updateCursorOnly(Game* game, int prevRow, int prevCol);
+
 #endif
