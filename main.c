@@ -51,11 +51,15 @@ void clearScreen() {
 #endif
 }
 
+
 int main() {
     srand(time(NULL));
     Game game;
     strcpy(game.gameName, "");
     game.gameState = STATE_MENU;
+
+    int prevGameState = STATE_MENU;
+
 
     while (1) {
         switch (game.gameState) {
@@ -136,10 +140,41 @@ int main() {
                 break;
             }
 
-            case STATE_PLAYING:
-                showGameInterface(&game);
-                handleGameInput(&game);
-                break;
+           case STATE_PLAYING: {
+    // Salva posizione cursore PRIMA di processare input
+    int oldRow = game.cursorRow;
+    int oldCol = game.cursorCol;
+    
+    // Reset flag se si rientra da altro stato
+    if (prevGameState != STATE_PLAYING) {
+        clearScreen();
+        showGameInterface(&game);
+
+        prevGameState = STATE_PLAYING;
+    }
+    
+    // PROCESS INPUT
+    handleGameInput(&game);
+    
+    // DECISIONE: cosa aggiornare?
+    if (game.gameState != STATE_PLAYING) {
+        // Cambio stato → prepara ridisegno completo
+
+    }
+    else if (oldRow != game.cursorRow || oldCol != game.cursorCol) {
+        // Solo movimento cursore → aggiornamento parziale
+        updateCursorOnly(&game, oldRow, oldCol);
+    }
+    else {
+        // Inserimento numero/errore → ridisegno completo
+        clearScreen();
+        showGameInterface(&game);
+    }
+    
+    // Salva stato corrente
+    prevGameState = game.gameState;
+    break;
+}
 
             case STATE_PAUSED:
                 clearScreen();
