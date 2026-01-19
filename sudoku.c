@@ -28,21 +28,22 @@
                - Gestione pause con salvataggio stato e ripresa precisa dalla posizione precedente
  ============================================================================
  */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "sudoku.h"
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
-
 /*  questo: */
 #include "input.h"  // INCLUDA SEMPRE input.h - FUORI dal #ifdef
-
+//
 #ifdef _WIN32
 #include <conio.h>
+#include <windows.h>  // <-- AGGIUNGI QUESTA RIGA QUI
 #else
 #include <termios.h>
+#include <unistd.h>   // <-- Sposta questa dentro #else (era fuori prima)
 #endif
 /* ========== FUNZIONE HELPER PER TROVARE NUMERO DISPONIBILE ========== */
 
@@ -51,6 +52,8 @@
  * Scansiona i file save1.txt, save2.txt, ... e ritorna il primo buco
  * Ritorna 0 se tutti i numeri 1-99 sono occupati
  */
+
+
 static int findAvailableSaveNumber() {
     int num = 1;
     char filename[100];
@@ -551,13 +554,13 @@ int findUnassignedLocation(Sudoku* s, int* row, int* col) {
             if (s->grid[i][j] == UNASSIGNED) {
                 *row = i;
                 *col = j;
-                return true;
+                return TRUE;
             }
             j = j + 1;
         }
         i = i + 1;
     }
-    return false;
+    return FALSE;
 }
 
 int solveGrid(Sudoku* s) {
@@ -1391,6 +1394,140 @@ void loadGameOption(Game* game, const char* filename) {
     }
 }
 
+void updateCursorOnly(Game* game, int prevRow, int prevCol) {
+    Sudoku* s = &game->sudoku;
+    
+    // Parametri layout (DEVONO corrispondere esattamente a showGameInterface)
+    int cellWidth = 3;
+    int leftPadding = 12;
+
+    
+    // Calcolo PRECISO delle coordinate di riga (1-based)
+    int baseRow = 5; // Riga dove inizia la griglia in showGameInterface
+    int termPrevRow = baseRow + prevRow + (prevRow / s->boxSize);
+    int termNewRow = baseRow + game->cursorRow + (game->cursorRow / s->boxSize);
+    
+    // Calcolo PRECISO delle coordinate di colonna (1-based)
+    int termPrevCol = MARGIN_LEFT + leftPadding + 1 + 
+                     (prevCol * cellWidth) + (prevCol / s->boxSize) + 1;
+    int termNewCol = MARGIN_LEFT + leftPadding + 1 + 
+                    (game->cursorCol * cellWidth) + (game->cursorCol / s->boxSize) + 1;
+    
+#ifdef _WIN32
+    // ========== IMPLEMENTAZIONE WINDOWS ==========
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD pos;
+    CONSOLE_CURSOR_INFO cursorInfo;
+    
+    // 1. NASCONDI CURSORE PER EVITARE FLICKERING
+    cursorInfo.bVisible = FALSE;
+    SetConsoleCursorInfo(hConsole, &cursorInfo);
+    
+    // 2. RIPRISTINA VECCHIA CELLA (non selezionata)
+    pos.Y = (SHORT)(termPrevRow - 1);
+    pos.X = (SHORT)(termPrevCol - 1);
+    SetConsoleCursorPosition(hConsole, pos);
+    
+    int val = s->grid[prevRow][prevCol];
+    int isDiagPrev = (prevRow == prevCol) || (prevRow + prevCol == s->size - 1);
+    
+    // Stampa ESATTAMENTE come in showGameInterface
+    if (val == UNASSIGNED) {
+        if (isDiagPrev) {
+            printf("%s . %s", COL_DIAGONAL, COL_RESET);
+        } else {
+            printf(" . ");
+        }
+    } else {
+        if (isDiagPrev) {
+            printf("%s %d %s", COL_DIAGONAL, val, COL_RESET);
+        } else {
+            printf(" %d ", val);
+        }
+    }
+    
+    // 3. EVIDENZIA NUOVA CELLA (selezionata)
+    pos.Y = (SHORT)(termNewRow - 1);
+    pos.X = (SHORT)(termNewCol - 1);
+    SetConsoleCursorPosition(hConsole, pos);
+    
+    val = s->grid[game->cursorRow][game->cursorCol];
+    int isDiagNew = (game->cursorRow == game->cursorCol) || 
+                    (game->cursorRow + game->cursorCol == s->size - 1);
+    
+    // Stampa ESATTAMENTE come in showGameInterface per celle selezionate
+    if (isDiagNew) {
+        if (val == UNASSIGNED) {
+            printf("%s[%s%c%s]%s", COL_DIAGONAL, COL_CURSOR, ' ', COL_DIAGONAL, COL_RESET);
+        } else {
+            printf("%s[%s%d%s]%s", COL_DIAGONAL, COL_CURSOR, val, COL_DIAGONAL, COL_RESET);
+        }
+    } else {
+        if (val == UNASSIGNED) {
+            printf("%s[%c]%s", COL_CURSOR, ' ', COL_RESET);
+        } else {
+            printf("%s[%d]%s", COL_CURSOR, val, COL_RESET);
+        }
+    }
+    
+    // 4. RIPOSIZIONA CURSORE IN FONDO
+    pos.Y = 30;  // Molto in basso per evitare interferenze
+    pos.X = 0;
+    SetConsoleCursorPosition(hConsole, pos);
+    
+#else
+    // ========== IMPLEMENTAZIONE UNIX/LINUX ==========
+    // 1. NASCONDI CURSORE TEMPORANEAMENTE
+    printf("\033[?25l");
+    fflush(stdout);
+    
+    // 2. RIPRISTINA VECCHIA CELLA
+    printf("\033[%d;%dH", termPrevRow, termPrevCol);
+    
+    int val = s->grid[prevRow][prevCol];
+    int isDiagPrev = (prevRow == prevCol) || (prevRow + prevCol == s->size - 1);
+    
+    if (val == UNASSIGNED) {
+        if (isDiagPrev) {
+            printf("%s . %s", COL_DIAGONAL, COL_RESET);
+        } else {
+            printf(" . ");
+        }
+    } else {
+        if (isDiagPrev) {
+            printf("%s %d %s", COL_DIAGONAL, val, COL_RESET);
+        } else {
+            printf(" %d ", val);
+        }
+    }
+    
+    // 3. EVIDENZIA NUOVA CELLA
+    printf("\033[%d;%dH", termNewRow, termNewCol);
+    
+    val = s->grid[game->cursorRow][game->cursorCol];
+    int isDiagNew = (game->cursorRow == game->cursorCol) || 
+                    (game->cursorRow + game->cursorCol == s->size - 1);
+    
+    if (isDiagNew) {
+        if (val == UNASSIGNED) {
+            printf("%s[%s%c%s]%s", COL_DIAGONAL, COL_CURSOR, ' ', COL_DIAGONAL, COL_RESET);
+        } else {
+            printf("%s[%s%d%s]%s", COL_DIAGONAL, COL_CURSOR, val, COL_DIAGONAL, COL_RESET);
+        }
+    } else {
+        if (val == UNASSIGNED) {
+            printf("%s[%c]%s", COL_CURSOR, ' ', COL_RESET);
+        } else {
+            printf("%s[%d]%s", COL_CURSOR, val, COL_RESET);
+        }
+    }
+    
+    // 4. RIPOSIZIONA IN FONDO E MOSTRA CURSORE
+    printf("\033[30;1H");  // Molto in basso
+    printf("\033[?25h");   // Mostra cursore
+    fflush(stdout);
+#endif
+}
 /**
 * Gestisce tutti gli input durante il gioco
 */
