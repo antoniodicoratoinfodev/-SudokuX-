@@ -10,6 +10,7 @@
                - Mappatura tasti speciali per tutte le piattaforme supportate
  ============================================================================
  */
+
 #ifndef INPUT_H
 #define INPUT_H
 
@@ -25,13 +26,7 @@
 #include <conio.h>
 #endif
 
-// Funzione per leggere l'input (bloccante)
+// Funzione per leggere l'input
 int getch_custom();
-
-// Funzione per input non bloccante (nuova)
-int getch_nonblocking();
-
-// Funzione per ripristinare terminale (nuova)
-void restore_terminal();
 
 #endif

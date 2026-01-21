@@ -92,11 +92,7 @@ int main() {
                         }
                     }
                     else if (key == CURSOR_BACK) {
-                        // USCITA CON ESC - ripristina terminale
-                                #ifndef _WIN32
-                                restore_terminal();
-                                #endif
-                    	return 0;
+                        return 0;
                     }
                 }
                 break;
@@ -144,75 +140,42 @@ int main() {
                 break;
             }
 
-            case STATE_PLAYING: {
-                time_t lastUpdate = time(NULL);
+           case STATE_PLAYING: {
+    // Salva posizione cursore PRIMA di processare input
+    int oldRow = game.cursorRow;
+    int oldCol = game.cursorCol;
+    
+    // Reset flag se si rientra da altro stato
+    if (prevGameState != STATE_PLAYING) {
+        clearScreen();
+        showGameInterface(&game);
 
-                // Ciclo di gioco principale
-                while (game.gameState == STATE_PLAYING) {
-                    time_t now = time(NULL);
+        prevGameState = STATE_PLAYING;
+    }
+    
+    // PROCESS INPUT
+    handleGameInput(&game);
+    
+    // DECISIONE: cosa aggiornare?
+    if (game.gameState != STATE_PLAYING) {
+        // Cambio stato → prepara ridisegno completo
 
-                    // 1. Aggiorna barra di stato ogni secondo
-                    if (now - lastUpdate >= 1) {
-                        updateLiveStatusBar(&game);
-                        lastUpdate = now;
-                    }
+    }
+    else if (oldRow != game.cursorRow || oldCol != game.cursorCol) {
+        // Solo movimento cursore → aggiornamento parziale
+        updateCursorOnly(&game, oldRow, oldCol);
+    }
+    else {
+        // Inserimento numero/errore → ridisegno completo
+        clearScreen();
+        showGameInterface(&game);
+    }
+    
+    // Salva stato corrente
+    prevGameState = game.gameState;
+    break;
+}
 
-                    // 2. Controlla input (non bloccante) con timeout più breve
-                    int key = getch_nonblocking();
-
-                    if (key != -1) { // Se c'è input
-                        // Salva posizione cursore PRIMA di processare input
-                        int oldRow = game.cursorRow;
-                        int oldCol = game.cursorCol;
-
-                        // Reset flag se si rientra da altro stato
-                        if (prevGameState != STATE_PLAYING) {
-                            clearScreen();
-                            showGameInterface(&game);
-                            prevGameState = STATE_PLAYING;
-                        }
-
-                        // Processa l'input (usa la funzione esistente)
-                        handleGameInput(&game, key);
-
-                        // DECISIONE: cosa aggiornare?
-                        if (game.gameState != STATE_PLAYING) {
-                            // Cambio stato → esce dal ciclo
-                            break;
-                        }
-                        else if (oldRow != game.cursorRow || oldCol != game.cursorCol) {
-                            // Solo movimento cursore → aggiornamento parziale
-                            updateCursorOnly(&game, oldRow, oldCol);
-                        }
-                        else {
-                            // Inserimento numero/errore → ridisegno completo
-                            clearScreen();
-                            showGameInterface(&game);
-                        }
-
-                        // Aggiorna barra anche dopo input
-                        updateLiveStatusBar(&game);
-                        lastUpdate = now;
-                    }
-
-                    // 3. Pausa più breve per migliorare la reattività (10ms invece di 50ms)
-                  #ifdef _WIN32
-                          Sleep(16);  // 1ms
-                  #else
-                          usleep(16000);  // 1ms
-                  #endif
-                }
-
-                // Salva stato corrente
-                prevGameState = game.gameState;
-
-                // Ripristina terminale quando esci dallo stato PLAYING
-                #ifndef _WIN32
-                restore_terminal();
-                #endif
-
-                break;
-            }
             case STATE_PAUSED:
                 clearScreen();
                 printf("[Pausa] Premi [R] per continuare, [M] per tornare al menu.\n");
@@ -255,12 +218,7 @@ int main() {
             default:
                 break;
         }
-
     }
-    // Ripristina terminale prima di uscire
-       #ifndef _WIN32
-       restore_terminal();
-       #endif
 
     return 0;
 }
