@@ -67,8 +67,8 @@ typedef struct {
     int errors;
     time_t startTime;
     char gameName[64];
+    int gameOver;  // <-- AGGIUNGI QUESTA RIGA
 } Game;
-
 // ================= FUNZIONI SUDOKU =================
 
 void initSudoku(Sudoku* s, int boxSize);
@@ -89,7 +89,7 @@ int showDynamicLoadMenu(int selected);
 void handleDynamicLoadInput(Game* game);
 
 // ================= FUNZIONI INTERFACCIA & GIOCO =================
-
+void updateLiveStatusBar(Game* game);
 void clearScreen();
 void showMainMenu(int selected);
 void showDifficultyMenu(int selected);
@@ -99,9 +99,15 @@ void showGameInterface(Game* game);
 void showWinScreen(Game* game);
 void newGame(Game* game, int difficultyLevel);
 void loadGameOption(Game* game, const char* filename);
-void handleGameInput(Game* game);
+void handleGameInput(Game* game, int key);
 int getch_custom();
 void deleteSavedGameInterface();
 // ================= OTTIMIZZAZIONE RENDERING =================
 void updateCursorOnly(Game* game, int prevRow, int prevCol);
+// ================= FUNZIONI SALVATAGGI ==============================
+
+int countSaveFiles();
+int showDynamicLoadMenu(int selected);
+void handleDynamicLoadInput(Game* game);
+
 #endif

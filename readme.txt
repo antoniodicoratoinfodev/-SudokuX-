@@ -1,0 +1,1 @@
+In caso di problemi con l'eseguibile o il salvataggio, aprire come amministratore.
