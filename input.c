@@ -10,7 +10,6 @@
                - Supporto sia per WASD che per frecce direzionali
                - Rilevamento sequenze multi-carattere per tasti funzione
                - Ripristino automatico impostazioni terminale dopo lettura
-               - Funzioni per nascondere/mostrare il cursore del terminale
  ============================================================================
  */
 
@@ -18,7 +17,6 @@
 
 #ifdef _WIN32
 #include <conio.h>
-#include <windows.h>
 
 int getch_custom() {
     int ch = _getch();
@@ -36,36 +34,12 @@ int getch_custom() {
     return ch;
 }
 
-/* ========== FUNZIONI PER GESTIONE CURSORE WINDOWS ========== */
-
-/**
- * Nasconde il cursore del terminale (Windows)
- */
-void hide_terminal_cursor() {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_CURSOR_INFO cursorInfo;
-    GetConsoleCursorInfo(hConsole, &cursorInfo);
-    cursorInfo.bVisible = FALSE;
-    SetConsoleCursorInfo(hConsole, &cursorInfo);
-}
-
-/**
- * Mostra il cursore del terminale (Windows)
- */
-void show_terminal_cursor() {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_CURSOR_INFO cursorInfo;
-    GetConsoleCursorInfo(hConsole, &cursorInfo);
-    cursorInfo.bVisible = TRUE;
-    SetConsoleCursorInfo(hConsole, &cursorInfo);
-}
-
 #else
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
-#include <sys/select.h>
-#include <sys/time.h>
+#include <sys/select.h>     // SPOSTATO QUI
+#include <sys/time.h>       // SPOSTATO QUI
 
 int getch_custom() {
     struct termios oldt, newt;
@@ -115,23 +89,4 @@ int getch_custom() {
     if (ch == 10) return CURSOR_SELECT;
     return ch;
 }
-
-/* ========== FUNZIONI PER GESTIONE CURSORE UNIX/LINUX ========== */
-
-/**
- * Nasconde il cursore del terminale (Unix/Linux)
- */
-void hide_terminal_cursor() {
-    printf("\033[?25l");
-    fflush(stdout);
-}
-
-/**
- * Mostra il cursore del terminale (Unix/Linux)
- */
-void show_terminal_cursor() {
-    printf("\033[?25h");
-    fflush(stdout);
-}
-
 #endif

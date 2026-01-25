@@ -27,7 +27,6 @@
 #define INNER_WIDTH  78
 #define MAX_SIZE 36
 #define UNASSIGNED 0
-#define COL_USER_NUM   "\033[1;33m"  /* Giallo brillante per numeri utente */
 
 // ================= COLORI TERMINALE =================
 #define COL_BORDER   "\033[1;36m"
@@ -54,9 +53,8 @@ typedef struct {
     int guessNum[MAX_SIZE];
     int difficultyLevel;
     int grid_status;
-    int size;                         // Dimensione griglia
-    int boxSize;                      // Dimensione sottogriglie
-    int userEntered[MAX_SIZE][MAX_SIZE]; // 1 se numero inserito da utente, 0 altrimenti
+    int size;  						  // Dimensione griglia (es. 9 per 9x9)
+    int boxSize;                      // Dimensione sottogriglie (es. 3)
 } Sudoku;
 
 // ================= STRUCT GAME =================
@@ -104,6 +102,5 @@ void loadGameOption(Game* game, const char* filename);
 void handleGameInput(Game* game);
 int getch_custom();
 void deleteSavedGameInterface();
-// ================= OTTIMIZZAZIONE RENDERING =================
-void updateCursorOnly(Game* game, int prevRow, int prevCol);
+
 #endif

@@ -51,29 +51,12 @@ void clearScreen() {
 #endif
 }
 
-
 int main() {
     srand(time(NULL));
     Game game;
     strcpy(game.gameName, "");
     game.gameState = STATE_MENU;
 
-    int prevGameState = STATE_MENU;
-  /* ========== NASCONDI CURSORE ALL'INIZIO ========== */
-    hide_terminal_cursor();
-    
-    /* ========== GESTIONE SEGNALI PER RIPRISTINO ========== */
-#ifdef _WIN32
-    // Windows - usa SetConsoleCtrlHandler
-    SetConsoleCtrlHandler((PHANDLER_ROUTINE)show_terminal_cursor, TRUE);
-#else
-    // Unix/Linux - usa signal()
-    signal(SIGINT, (void (*)(int))show_terminal_cursor);
-    signal(SIGTERM, (void (*)(int))show_terminal_cursor);
-#endif
-    
-    /* ========== RIPRISTINA CURSORE ALL'USCITA ========== */
-    atexit(show_terminal_cursor);
     while (1) {
         switch (game.gameState) {
             case STATE_MENU: {
@@ -153,41 +136,10 @@ int main() {
                 break;
             }
 
-           case STATE_PLAYING: {
-    // Salva posizione cursore PRIMA di processare input
-    int oldRow = game.cursorRow;
-    int oldCol = game.cursorCol;
-    
-    // Reset flag se si rientra da altro stato
-    if (prevGameState != STATE_PLAYING) {
-        clearScreen();
-        showGameInterface(&game);
-
-        prevGameState = STATE_PLAYING;
-    }
-    
-    // PROCESS INPUT
-    handleGameInput(&game);
-    
-    // DECISIONE: cosa aggiornare?
-    if (game.gameState != STATE_PLAYING) {
-        // Cambio stato → prepara ridisegno completo
-
-    }
-    else if (oldRow != game.cursorRow || oldCol != game.cursorCol) {
-        // Solo movimento cursore → aggiornamento parziale
-        updateCursorOnly(&game, oldRow, oldCol);
-    }
-    else {
-        // Inserimento numero/errore → ridisegno completo
-        clearScreen();
-        showGameInterface(&game);
-    }
-    
-    // Salva stato corrente
-    prevGameState = game.gameState;
-    break;
-}
+            case STATE_PLAYING:
+                showGameInterface(&game);
+                handleGameInput(&game);
+                break;
 
             case STATE_PAUSED:
                 clearScreen();
