@@ -16,10 +16,9 @@ This project is **NOT open source**. The source code and all related files are p
 It is allowed to:
 
 * Run and use the program for personal, free, non-commercial purposes
-* Study the source code without modifying it
+* Study the source code
 
 **Prohibited Uses**
-It is not allowed to:
 
 * Copy the source code, in whole or in part
 * Modify the code or create derivative works
@@ -71,10 +70,9 @@ Questo progetto **NON è open source**. Il codice sorgente e tutti i file correl
 È permesso:
 
 * Eseguire e utilizzare il programma per uso personale, gratuito e non commerciale
-* Studiare il codice sorgente senza modificarlo
+* Studiare il codice sorgente
 
 **Usi vietati**
-Non è consentito:
 
 * Copiare il codice sorgente, in tutto o in parte
 * Modificare il codice o creare opere derivate
