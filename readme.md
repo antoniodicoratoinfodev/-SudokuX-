@@ -3,18 +3,6 @@
 
 ---
 
-**Project Origin and Development**
-This program, written in C, was initially designed and developed by Antonio Dicorato and Leonardo Gerardi.
-Subsequently, the project was fully maintained, expanded, and developed by Antonio Dicorato.
-
-All versions published on GitHub — from the first to the current ones — are created by Antonio Dicorato and represent evolutions of the original project, with the following goals:
-
-* Gradually improve technical skills
-* Refine the quality, structure, and readability of the code
-* Develop cross-platform programming skills
-* Encourage experimentation and personal growth as a developer
-* Provide an enjoyable and educational experience
-
 **License and Use**
 Copyright © 2026 Antonio Dicorato — All rights reserved.
 This project is **NOT open source**. The source code and all related files are provided solely for the purposes described below.
@@ -49,22 +37,26 @@ Any use, reproduction, modification, redistribution, or appropriation of the pro
 
 ---
 
+**Project Origin and Development**
+This program, written in C, was initially designed and developed by Antonio Dicorato and Leonardo Gerardi.
+Subsequently, the project was fully maintained, expanded, and developed by Antonio Dicorato.
+
+All versions published on GitHub — from the first to the current ones — are created by Antonio Dicorato and represent evolutions of the original project, with the following goals:
+
+* Gradually improve technical skills
+* Refine the quality, structure, and readability of the code
+* Develop cross-platform programming skills
+* Encourage experimentation and personal growth as a developer
+* Provide an enjoyable and educational experience
+
+---
+
 ### Italiano 
 
 **AVVISO IMPORTANTE**
 *Solo Windows:* se riscontri problemi con l’eseguibile o con i file di salvataggio, avvia il programma come amministratore.
 
-**Origine e sviluppo del progetto**
-Questo programma, scritto in linguaggio C, è stato inizialmente ideato e sviluppato da Antonio Dicorato e Leonardo Gerardi.
-Successivamente, il progetto è stato portato avanti, ampliato e mantenuto interamente da Antonio Dicorato.
-
-Tutte le versioni pubblicate su GitHub — dalla prima fino a quelle attuali — sono opera di Antonio Dicorato e rappresentano evoluzioni del progetto originale, con i seguenti obiettivi:
-
-* Migliorare progressivamente le capacità tecniche
-* Affinare qualità, struttura e leggibilità del codice
-* Sviluppare competenze di programmazione multipiattaforma
-* Favorire sperimentazione e crescita personale come sviluppatore
-* Offrire un’esperienza ludica e formativa
+---
 
 **Licenza e utilizzo**
 Copyright © 2026 Antonio Dicorato — Tutti i diritti riservati.
@@ -100,3 +92,16 @@ Qualsiasi utilizzo, riproduzione, modifica, ridistribuzione o appropriazione del
 
 ---
 
+**Origine e sviluppo del progetto**
+Questo programma, scritto in linguaggio C, è stato inizialmente ideato e sviluppato da Antonio Dicorato e Leonardo Gerardi.
+Successivamente, il progetto è stato portato avanti, ampliato e mantenuto interamente da Antonio Dicorato.
+
+Tutte le versioni pubblicate su GitHub — dalla prima fino a quelle attuali — sono opera di Antonio Dicorato e rappresentano evoluzioni del progetto originale, con i seguenti obiettivi:
+
+* Migliorare progressivamente le capacità tecniche
+* Affinare qualità, struttura e leggibilità del codice
+* Sviluppare competenze di programmazione multipiattaforma
+* Favorire sperimentazione e crescita personale come sviluppatore
+* Offrire un’esperienza ludica e formativa
+
+---
