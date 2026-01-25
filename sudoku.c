@@ -28,21 +28,22 @@
                - Gestione pause con salvataggio stato e ripresa precisa dalla posizione precedente
  ============================================================================
  */
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "sudoku.h"
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
-
 /*  questo: */
 #include "input.h"  // INCLUDA SEMPRE input.h - FUORI dal #ifdef
-
+//
 #ifdef _WIN32
 #include <conio.h>
+#include <windows.h>  // <-- AGGIUNGI QUESTA RIGA QUI
 #else
 #include <termios.h>
+#include <unistd.h>   // <-- Sposta questa dentro #else (era fuori prima)
 #endif
 /* ========== FUNZIONE HELPER PER TROVARE NUMERO DISPONIBILE ========== */
 
@@ -51,6 +52,8 @@
  * Scansiona i file save1.txt, save2.txt, ... e ritorna il primo buco
  * Ritorna 0 se tutti i numeri 1-99 sono occupati
  */
+
+
 static int findAvailableSaveNumber() {
     int num = 1;
     char filename[100];
@@ -440,6 +443,7 @@ void initSudoku(Sudoku* s, int boxSize) {
         int j = 0;
         while (j < s->size) {
             s->grid[i][j] = UNASSIGNED;
+            s->userEntered[i][j] = 0;  // Inizializza a 0 (non inserito da utente)
             j = j + 1;
         }
         i = i + 1;
@@ -551,13 +555,13 @@ int findUnassignedLocation(Sudoku* s, int* row, int* col) {
             if (s->grid[i][j] == UNASSIGNED) {
                 *row = i;
                 *col = j;
-                return true;
+                return TRUE;
             }
             j = j + 1;
         }
         i = i + 1;
     }
-    return false;
+    return FALSE;
 }
 
 int solveGrid(Sudoku* s) {
@@ -607,6 +611,31 @@ void generatePuzzle(Sudoku* s, int difficultyLevel) {
     int totalCells = s->size * s->size;
     int toRemove = 0;
 
+    // PRIMA di rimuovere celle, salva la griglia completa
+    int originalGrid[MAX_SIZE][MAX_SIZE];
+    int i = 0, j = 0;
+    
+    // Copia la griglia completa
+    while (i < s->size) {
+        j = 0;
+        while (j < s->size) {
+            originalGrid[i][j] = s->grid[i][j];
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    // Imposta userEntered a 0 per tutte le celle (saranno numeri originali)
+    i = 0;
+    while (i < s->size) {
+        j = 0;
+        while (j < s->size) {
+            s->userEntered[i][j] = 0;
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+
     // Imposta quante celle rimuovere in base alla difficoltà
     switch (difficultyLevel) {
         case 1: // Facile ~33%
@@ -623,6 +652,7 @@ void generatePuzzle(Sudoku* s, int difficultyLevel) {
             break;
     }
 
+    // Rimuovi celle casuali
     while (toRemove > 0) {
         int i = genRandNum(s->size);
         int j = genRandNum(s->size);
@@ -693,11 +723,25 @@ int saveGame(Sudoku* s, const char* filename, int cursorRow, int cursorCol, int 
     fprintf(file, "%d %d\n", s->size, s->boxSize);
     fprintf(file, "%d %d %d %d\n", cursorRow, cursorCol, errors, score);
 
+    // Salva la griglia
     int i = 0;
     while (i < s->size) {
         int j = 0;
         while (j < s->size) {
             fprintf(file, "%d ", s->grid[i][j]);
+            j = j + 1;
+        }
+        fprintf(file, "\n");
+        i = i + 1;
+    }
+    
+    // Salva userEntered
+    fprintf(file, "\n");  // Separatore
+    i = 0;
+    while (i < s->size) {
+        int j = 0;
+        while (j < s->size) {
+            fprintf(file, "%d ", s->userEntered[i][j]);
             j = j + 1;
         }
         fprintf(file, "\n");
@@ -737,6 +781,7 @@ int loadGame(Sudoku* s, const char* filename, int* cursorRow, int* cursorCol, in
         return 0;
     }
 
+    // Carica la griglia
     int i = 0;
     while (i < s->size) {
         int j = 0;
@@ -748,6 +793,25 @@ int loadGame(Sudoku* s, const char* filename, int* cursorRow, int* cursorCol, in
             j = j + 1;
         }
         i = i + 1;
+    }
+    
+    // Prova a caricare userEntered (potrebbe non esistere in salvataggi vecchi)
+    // Leggi un carattere per vedere se c'è il separatore
+    char ch = fgetc(file);
+    if (ch == '\n') {
+        // C'è il separatore, carica userEntered
+        i = 0;
+        while (i < s->size) {
+            int j = 0;
+            while (j < s->size) {
+                if (fscanf(file, "%d", &s->userEntered[i][j]) != 1) {
+                    // Se fallisce, imposta a 0
+                    s->userEntered[i][j] = 0;
+                }
+                j = j + 1;
+            }
+            i = i + 1;
+        }
     }
 
     fclose(file);
@@ -1114,8 +1178,9 @@ void showGameInterface(Game* game) {
 
         int j = 0;
         while (j < s->size) {
-            int isDiagonal = (i == j) || (i + j == s->size - 1);
             int isCursor = (i == game->cursorRow && j == game->cursorCol);
+            int isDiagonal = (i == j) || (i + j == s->size - 1);
+            int isUserNumber = (s->userEntered[i][j] == 1 && s->grid[i][j] != UNASSIGNED);
             int val = s->grid[i][j];
 
             const char* colorPrefix = "";
@@ -1123,6 +1188,9 @@ void showGameInterface(Game* game) {
 
             if (isCursor) {
                 colorPrefix = COL_CURSOR;
+                colorSuffix = COL_RESET;
+            } else if (isUserNumber) {
+                colorPrefix = COL_USER_NUM;  // Giallo per numeri utente
                 colorSuffix = COL_RESET;
             } else if (isDiagonal && diagonalColor) {
                 colorPrefix = diagonalColor;
@@ -1391,6 +1459,150 @@ void loadGameOption(Game* game, const char* filename) {
     }
 }
 
+void updateCursorOnly(Game* game, int prevRow, int prevCol) {
+    Sudoku* s = &game->sudoku;
+    
+    // Parametri layout
+    int cellWidth = 3;
+    int leftPadding = 12;
+    
+    // Calcolo coordinate
+    int baseRow = 5;
+    int termPrevRow = baseRow + prevRow + (prevRow / s->boxSize);
+    int termNewRow = baseRow + game->cursorRow + (game->cursorRow / s->boxSize);
+    
+    int termPrevCol = MARGIN_LEFT + leftPadding + 1 + 
+                     (prevCol * cellWidth) + (prevCol / s->boxSize) + 1;
+    int termNewCol = MARGIN_LEFT + leftPadding + 1 + 
+                    (game->cursorCol * cellWidth) + (game->cursorCol / s->boxSize) + 1;
+    
+#ifdef _WIN32
+    // ========== IMPLEMENTAZIONE WINDOWS ==========
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD pos;
+    
+    // 1. RIPRISTINA VECCHIA CELLA
+    pos.Y = (SHORT)(termPrevRow - 1);
+    pos.X = (SHORT)(termPrevCol - 1);
+    SetConsoleCursorPosition(hConsole, pos);
+    
+    int val = s->grid[prevRow][prevCol];
+    int isDiagPrev = (prevRow == prevCol) || (prevRow + prevCol == s->size - 1);
+    int isUserPrev = (s->userEntered[prevRow][prevCol] == 1 && val != UNASSIGNED);
+    
+    // Determina il colore per la vecchia cella
+    const char* colorPrev = "";
+    if (isUserPrev) {
+        colorPrev = COL_USER_NUM;
+    } else if (isDiagPrev) {
+        colorPrev = COL_DIAGONAL;
+    }
+    
+    // Stampa la vecchia cella
+    if (val == UNASSIGNED) {
+        if (isDiagPrev) {
+            printf("%s . %s", COL_DIAGONAL, COL_RESET);
+        } else {
+            printf(" . ");
+        }
+    } else {
+        if (colorPrev[0]) {
+            printf("%s %d %s", colorPrev, val, COL_RESET);
+        } else {
+            printf(" %d ", val);
+        }
+    }
+    
+    // 2. EVIDENZIA NUOVA CELLA
+    pos.Y = (SHORT)(termNewRow - 1);
+    pos.X = (SHORT)(termNewCol - 1);
+    SetConsoleCursorPosition(hConsole, pos);
+    
+    val = s->grid[game->cursorRow][game->cursorCol];
+    int isDiagNew = (game->cursorRow == game->cursorCol) || 
+                    (game->cursorRow + game->cursorCol == s->size - 1);
+    int isUserNew = (s->userEntered[game->cursorRow][game->cursorCol] == 1 && val != UNASSIGNED);
+    
+    // Stampa la nuova cella (sempre con colore cursore)
+    if (isDiagNew) {
+        if (val == UNASSIGNED) {
+            printf("%s[%s%c%s]%s", COL_DIAGONAL, COL_CURSOR, ' ', COL_DIAGONAL, COL_RESET);
+        } else {
+            printf("%s[%s%d%s]%s", COL_DIAGONAL, COL_CURSOR, val, COL_DIAGONAL, COL_RESET);
+        }
+    } else {
+        if (val == UNASSIGNED) {
+            printf("%s[%c]%s", COL_CURSOR, ' ', COL_RESET);
+        } else {
+            printf("%s[%d]%s", COL_CURSOR, val, COL_RESET);
+        }
+    }
+    
+    // 3. RIPOSIZIONA CURSORE IN FONDO
+    pos.Y = 30;
+    pos.X = 0;
+    SetConsoleCursorPosition(hConsole, pos);
+    
+#else
+    // ========== IMPLEMENTAZIONE UNIX/LINUX ==========
+    
+    // 1. RIPRISTINA VECCHIA CELLA
+    printf("\033[%d;%dH", termPrevRow, termPrevCol);
+    
+    int val = s->grid[prevRow][prevCol];
+    int isDiagPrev = (prevRow == prevCol) || (prevRow + prevCol == s->size - 1);
+    int isUserPrev = (s->userEntered[prevRow][prevCol] == 1 && val != UNASSIGNED);
+    
+    // Determina il colore per la vecchia cella
+    const char* colorPrev = "";
+    if (isUserPrev) {
+        colorPrev = COL_USER_NUM;
+    } else if (isDiagPrev) {
+        colorPrev = COL_DIAGONAL;
+    }
+    
+    // Stampa la vecchia cella
+    if (val == UNASSIGNED) {
+        if (isDiagPrev) {
+            printf("%s . %s", COL_DIAGONAL, COL_RESET);
+        } else {
+            printf(" . ");
+        }
+    } else {
+        if (colorPrev[0]) {
+            printf("%s %d %s", colorPrev, val, COL_RESET);
+        } else {
+            printf(" %d ", val);
+        }
+    }
+    
+    // 2. EVIDENZIA NUOVA CELLA
+    printf("\033[%d;%dH", termNewRow, termNewCol);
+    
+    val = s->grid[game->cursorRow][game->cursorCol];
+    int isDiagNew = (game->cursorRow == game->cursorCol) || 
+                    (game->cursorRow + game->cursorCol == s->size - 1);
+    
+    // Stampa la nuova cella (sempre con colore cursore)
+    if (isDiagNew) {
+        if (val == UNASSIGNED) {
+            printf("%s[%s%c%s]%s", COL_DIAGONAL, COL_CURSOR, ' ', COL_DIAGONAL, COL_RESET);
+        } else {
+            printf("%s[%s%d%s]%s", COL_DIAGONAL, COL_CURSOR, val, COL_DIAGONAL, COL_RESET);
+        }
+    } else {
+        if (val == UNASSIGNED) {
+            printf("%s[%c]%s", COL_CURSOR, ' ', COL_RESET);
+        } else {
+            printf("%s[%d]%s", COL_CURSOR, val, COL_RESET);
+        }
+    }
+    
+    // 3. RIPOSIZIONA IN FONDO
+    printf("\033[30;1H");
+    fflush(stdout);
+#endif
+}
 /**
 * Gestisce tutti gli input durante il gioco
 */
@@ -1412,31 +1624,38 @@ void handleGameInput(Game* game) {
             break;
 
         case '0':
-            game->sudoku.grid[game->cursorRow][game->cursorCol] = UNASSIGNED;
-            break;
+    // Solo se il numero era stato inserito dall'utente
+    if (game->sudoku.userEntered[game->cursorRow][game->cursorCol] == 1) {
+        game->sudoku.grid[game->cursorRow][game->cursorCol] = UNASSIGNED;
+        game->sudoku.userEntered[game->cursorRow][game->cursorCol] = 0;
+    }
+    break;
 
         case '1': case '2': case '3': case '4': case '5':
-        case '6': case '7': case '8': case '9': {
-            int num = key - '0';
-            if (num <= game->sudoku.size) {
-                if (isSafe(&game->sudoku, game->cursorRow, game->cursorCol, num)) {
-                    game->sudoku.grid[game->cursorRow][game->cursorCol] = num;
-                    game->score = game->score + 10;
+case '6': case '7': case '8': case '9': {
+    int num = key - '0';
+    if (num <= game->sudoku.size) {
+        // Segna che questo numero è stato inserito dall'utente
+        game->sudoku.userEntered[game->cursorRow][game->cursorCol] = 1;
+        
+        if (isSafe(&game->sudoku, game->cursorRow, game->cursorCol, num)) {
+            game->sudoku.grid[game->cursorRow][game->cursorCol] = num;
+            game->score = game->score + 10;
 
-                    if (isComplete(&game->sudoku)) {
-                        game->gameState = STATE_WIN;
-                    }
-                } else {
-                    game->errors = game->errors + 1;
-                    game->score = game->score - 5;
-
-                    if (game->errors >= 5) {
-                        game->gameState = STATE_GAMEOVER;
-                    }
-                }
+            if (isComplete(&game->sudoku)) {
+                game->gameState = STATE_WIN;
             }
-            break;
+        } else {
+            game->errors = game->errors + 1;
+            game->score = game->score - 5;
+
+            if (game->errors >= 5) {
+                game->gameState = STATE_GAMEOVER;
+            }
         }
+    }
+    break;
+}
 
         case 'p': case 'P':
             game->gameState = STATE_PAUSED;
