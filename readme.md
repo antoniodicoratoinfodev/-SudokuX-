@@ -3,6 +3,8 @@
 **IMPORTANT NOTICE**
 *Windows only:* if you encounter issues with the executable or save files, run the program as administrator.
 
+---
+
 **Project Origin and Development**
 This program, written in C, was initially designed and developed by Antonio Dicorato and Leonardo Gerardi.
 Subsequently, the project was fully maintained, expanded, and developed by Antonio Dicorato.
