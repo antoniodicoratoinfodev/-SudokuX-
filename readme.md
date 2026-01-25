@@ -49,11 +49,6 @@ Any use, reproduction, modification, redistribution, or appropriation of the pro
 
 ---
 
-Se vuoi, posso anche fare una **versione più breve e snella**, adatta per inserirla direttamente in un README o in un file di avviso del programma. Vuoi che lo faccia?
-
-
----
-
 ### Italiano 
 
 **AVVISO IMPORTANTE**
