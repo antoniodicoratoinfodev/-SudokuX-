@@ -1,5 +1,3 @@
-### English 
-
 **IMPORTANT NOTICE**
 *Windows only:* if you encounter issues with the executable or save files, run the program as administrator.
 
