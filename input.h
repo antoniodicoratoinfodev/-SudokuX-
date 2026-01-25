@@ -28,5 +28,9 @@
 
 // Funzione per leggere l'input
 int getch_custom();
+/* ... dopo i prototipi esistenti ... */
 
+// Funzioni per gestione cursore terminale
+void hide_terminal_cursor();
+void show_terminal_cursor();
 #endif
