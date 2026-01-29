@@ -29,7 +29,7 @@ It is allowed to:
 
 **Contributions and Feedback**
 Suggestions, feedback, or improvement proposals must be communicated directly to the author.
-If deemed valid, they may be implemented at the sole discretion of the author and, if appropriate, accompanied by an explicit acknowledgment of the contributor, without granting any ownership or usage rights to the project or source code.
+If deemed valid, they may be implemented at the sole discretion of the author and, if appropriate, accompanied by explicit acknowledgment of the contributor, without granting any ownership or usage rights to the project or source code.
 
 **Legal Notice**
 Any use, reproduction, modification, redistribution, or appropriation of the project or source code outside the permissions granted, and without prior written authorization from the author, is strictly prohibited and constitutes a violation of copyright law.
@@ -38,9 +38,9 @@ Any use, reproduction, modification, redistribution, or appropriation of the pro
 
 **Project Origin and Development**
 This program, written in C, was initially designed and developed by Antonio Dicorato and Leonardo Gerardi.
-Subsequently, the project was fully maintained, expanded, and developed by Antonio Dicorato.
+Subsequently, the project was maintained, expanded, and developed entirely by Antonio Dicorato.
 
-All versions published on GitHub — from the first to the current ones — are created by Antonio Dicorato and represent evolutions of the original project, with the following goals:
+All versions published on my GitHub — from the first to the current ones — are the work of Antonio Dicorato and represent evolutions of the original project, with the following goals:
 
 * Gradually improve technical skills
 * Refine the quality, structure, and readability of the code
@@ -50,7 +50,7 @@ All versions published on GitHub — from the first to the current ones — are 
 
 ---
 
-### Italiano 
+### Italiano
 
 **AVVISO IMPORTANTE**
 *Solo Windows:* se riscontri problemi con l’eseguibile o con i file di salvataggio, avvia il programma come amministratore.
@@ -83,7 +83,7 @@ Questo progetto **NON è open source**. Il codice sorgente e tutti i file correl
 
 **Contributi e feedback**
 Suggerimenti, feedback o proposte di miglioramento devono essere comunicati direttamente all’autore.
-Se ritenuti validi, potranno essere implementati a discrezione esclusiva dell’autore e, se opportuno, accompagnati da una citazione del contribuente, senza conferire alcun diritto di proprietà o utilizzo sul progetto o sul codice sorgente.
+Se ritenuti validi, potranno essere implementati a discrezione esclusiva dell’autore e, se opportuno, accompagnati da una menzione esplicita del collaboratore, senza conferire alcun diritto di proprietà o utilizzo sul progetto o sul codice sorgente.
 
 **Nota legale**
 Qualsiasi utilizzo, riproduzione, modifica, ridistribuzione o appropriazione del progetto o del codice sorgente al di fuori delle autorizzazioni indicate e senza preventiva autorizzazione scritta dell’autore è severamente vietato e costituisce violazione del diritto d’autore.
@@ -92,9 +92,9 @@ Qualsiasi utilizzo, riproduzione, modifica, ridistribuzione o appropriazione del
 
 **Origine e sviluppo del progetto**
 Questo programma, scritto in linguaggio C, è stato inizialmente ideato e sviluppato da Antonio Dicorato e Leonardo Gerardi.
-Successivamente, il progetto è stato portato avanti, ampliato e mantenuto interamente da Antonio Dicorato.
+Successivamente, il progetto è stato mantenuto, ampliato e sviluppato interamente da Antonio Dicorato.
 
-Tutte le versioni pubblicate su GitHub — dalla prima fino a quelle attuali — sono opera di Antonio Dicorato e rappresentano evoluzioni del progetto originale, con i seguenti obiettivi:
+Tutte le versioni pubblicate sul mio GitHub — dalla prima fino a quelle attuali — sono opera di Antonio Dicorato e rappresentano evoluzioni del progetto originale, con i seguenti obiettivi:
 
 * Migliorare progressivamente le capacità tecniche
 * Affinare qualità, struttura e leggibilità del codice
