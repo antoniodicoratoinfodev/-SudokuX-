@@ -555,13 +555,13 @@ int findUnassignedLocation(Sudoku* s, int* row, int* col) {
             if (s->grid[i][j] == UNASSIGNED) {
                 *row = i;
                 *col = j;
-                return TRUE;
+                return true;
             }
             j = j + 1;
         }
         i = i + 1;
     }
-    return FALSE;
+    return false;
 }
 
 int solveGrid(Sudoku* s) {
